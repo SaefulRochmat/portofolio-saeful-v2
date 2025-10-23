@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '../../../../lib/supabaseClient';
-import { Project } from './typeProject';
+import { supabase } from '../../../lib/supabaseClient';
+import type { Project } from './typeProject';
 
 // Handler for GET requests to /api/projects
 // Ambil semua project (bisa juga nanti difilter berdasarkan profile_id jika diperlukan)

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { supabase } from "../../../../lib/supabaseClient";
-import { Profile } from "./typeProfile";
+import { supabase } from "../../../lib/supabaseClient";
+import type { Profile } from "./typeProfile";
 
 
 // Handler for GET requests to /api/profile
