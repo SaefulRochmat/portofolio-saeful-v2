@@ -1,8 +1,19 @@
 // src/app/dashboard/page.tsx
 import LoginButton from "@/components/LoginLogoutButton";
 import UserGreetText from "@/components/UserGreetText";
+import { redirect } from "next/navigation";
+import { createClient } from "@/utils/supabase/server";
 
-export default function Dashboard () {
+export default async function Dashboard () {
+
+    const supabase = await createClient()
+
+    // Verify user session
+    const { data: { user }, error } = await supabase.auth.getUser()
+    
+    if (error || !user) {
+        redirect('/login')
+    }
  
     return (
         <>
