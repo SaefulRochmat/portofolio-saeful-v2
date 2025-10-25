@@ -1,31 +1,33 @@
-// app/utils/supabase/server.js
-
-import { createServerClient } from '@supabase/ssr'
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-export async function createClient() {
-  const cookieStore = await cookies()
+export function createClient() {
+  const cookieStore = cookies()
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        async get(name) {
-          return (await cookieStore).get(name)?.value
+        get(name: string) {
+          return cookieStore.get(name)?.value
         },
-        async set(name, value, options) {
+        set(name: string, value: string, options: CookieOptions) {
           try {
-            (await cookieStore).set({ name, value, ...options })
-          } catch {
-            // Handle error jika diperlukan
+            cookieStore.set({ name, value, ...options })
+          } catch (error) {
+            // The `set` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
           }
         },
-        async remove(name, options) {
+        remove(name: string, options: CookieOptions) {
           try {
-            (await cookieStore).set({ name, value: '', ...options })
-          } catch {
-            // Handle error jika diperlukan
+            cookieStore.set({ name, value: '', ...options })
+          } catch (error) {
+            // The `delete` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
           }
         },
       },
