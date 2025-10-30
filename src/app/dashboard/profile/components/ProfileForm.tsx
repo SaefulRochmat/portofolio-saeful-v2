@@ -2,7 +2,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Phone, MapPin, Link2, Image, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Link2, Images, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+import Image from 'next/image';
 
 // Type definitions
 interface SocialLinks {
@@ -89,7 +90,7 @@ const ProfileManager: React.FC = () => {
         setMessage({ type: 'info', text: 'Belum ada profile. Silakan buat profile baru.' });
         setIsEditing(true);
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Gagal memuat profile' });
     } finally {
       setIsLoading(false);
@@ -128,7 +129,7 @@ const ProfileManager: React.FC = () => {
         const error = await response.json();
         setMessage({ type: 'error', text: error.error || 'Terjadi kesalahan' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Gagal menyimpan profile' });
     } finally {
       setSaving(false);
@@ -137,7 +138,7 @@ const ProfileManager: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
           <p className="text-slate-600">Memuat profile...</p>
@@ -147,7 +148,7 @@ const ProfileManager: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
@@ -273,7 +274,7 @@ const ProfileManager: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  <Image className="w-4 h-4 inline mr-2" />
+                  <Images className="w-4 h-4 inline mr-2" />
                   URL Foto Profile
                 </label>
                 <input
@@ -344,12 +345,14 @@ const ProfileManager: React.FC = () => {
           </div>
         ) : (
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex items-start gap-6">
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
               {formData.profile_image && (
-                <img
+                <Image
                   src={formData.profile_image}
+                  width={400}
+                  height={200}
                   alt={formData.name}
-                  className="w-32 h-32 rounded-full object-cover border-4 border-slate-100"
+                  className="w-1/2s rounded-xl object-contain border-4 border-slate-100"
                 />
               )}
               <div className="flex-1">
@@ -358,10 +361,10 @@ const ProfileManager: React.FC = () => {
                   <p className="text-blue-600 font-medium mt-1">{formData.headline}</p>
                 )}
                 {formData.bio && (
-                  <p className="text-slate-600 mt-3">{formData.bio}</p>
+                  <p className="text-slate-600 mt-3 text-justify">{formData.bio}</p>
                 )}
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+                <div className="grid grid-cols-1 gap-3 mt-4">
                   {formData.email && (
                     <div className="flex items-center gap-2 text-slate-600">
                       <Mail className="w-4 h-4" />

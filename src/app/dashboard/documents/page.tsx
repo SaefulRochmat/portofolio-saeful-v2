@@ -1,9 +1,8 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import DataProfile from "./components/ProfileForm";
+import DocumentsForm from "./components/DocumentForm";
 
-
-export default async function ProfilePage() {
+export default async function DocumentsPage() {
     const supabase = await createClient()
 
     // Verify user session
@@ -13,8 +12,8 @@ export default async function ProfilePage() {
         redirect('/login')
     }
     return (
-    <div className="min-h-screen bg-gray-50 py-10">
-      <DataProfile />
-    </div>
+        <>
+            <DocumentsForm/>
+        </>
     );
 }
