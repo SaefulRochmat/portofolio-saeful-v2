@@ -1,3 +1,5 @@
+// src/app/dashboard/education/components/EducationForm.tsx
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -7,7 +9,7 @@ export default function EducationPage() {
   const [educations, setEducations] = useState<Education[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<Education>>({
     institution: "",
     degree: "",
@@ -81,7 +83,7 @@ export default function EducationPage() {
       // Convert year strings to numbers
       const dataToSend = {
         ...formData,
-        id: editingId,
+        id: editingId, // string UUID, bukan number
         start_year: formData.start_year ? parseInt(formData.start_year as string) : null,
         end_year: formData.end_year ? parseInt(formData.end_year as string) : null,
       };
@@ -110,7 +112,7 @@ export default function EducationPage() {
   };
 
   // Delete education record
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (!confirm("Apakah Anda yakin ingin menghapus data ini?")) return;
 
     try {
@@ -121,25 +123,19 @@ export default function EducationPage() {
       });
       if (res.ok) {
         await fetchEducations();
+      } else {
+        const result = await res.json();
+        alert(`Error: ${result.error || "Gagal menghapus data"}`);
       }
     } catch (error) {
       console.error("Error deleting education:", error);
     }
   };
 
+
   // Open modal for editing
   const handleEdit = (edu: Education) => {
-    // Normalize id to number | null to satisfy the state type
-    const idNum: number | null = (() => {
-      if (typeof edu.id === "number") return edu.id;
-      if (typeof edu.id === "string") {
-        const parsed = parseInt(edu.id, 10);
-        return Number.isNaN(parsed) ? null : parsed;
-      }
-      return null;
-    })();
-
-    setEditingId(idNum);
+    setEditingId(edu.id || null);
     setFormData({
       institution: edu.institution,
       degree: edu.degree,
@@ -150,6 +146,7 @@ export default function EducationPage() {
     });
     setIsModalOpen(true);
   };
+
 
   // Reset form and close modal
   const resetForm = () => {
@@ -246,19 +243,7 @@ export default function EducationPage() {
                         Edit
                       </button>
                       <button
-                        onClick={() => {
-                          const idToDelete =
-                            typeof edu.id === "number"
-                              ? edu.id
-                              : edu.id
-                              ? parseInt(String(edu.id), 10)
-                              : NaN;
-                          if (Number.isNaN(idToDelete)) {
-                            console.error("Invalid id for deletion:", edu.id);
-                            return;
-                          }
-                          handleDelete(idToDelete);
-                        }}
+                        onClick={() => handleDelete(edu.id!)}
                         className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
                       >
                         Hapus
