@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
-import { supabase } from "../../../lib/supabaseClient";
+import { createClient } from "@/utils/supabase/server";
 import type { Experience } from "./typeExperience";
 
 // === GET All Experience ===
 export async function GET() {
+  const supabase = createClient()
   const { data, error } = await supabase
     .from("experience")
     .select("*")
@@ -16,6 +17,7 @@ export async function GET() {
 
 // === POST (Create New Experience) ===
 export async function POST(req: Request) {
+  const supabase = createClient()
   const body: Experience = await req.json();
 
   const { position, company, start_date, end_date, description } = body;
@@ -33,6 +35,7 @@ export async function POST(req: Request) {
 
 // === PUT (Update Experience) ===
 export async function PUT(req: Request) {
+  const supabase = createClient()
   const body: Experience = await req.json();
 
   if (!body.id)
@@ -58,6 +61,7 @@ export async function PUT(req: Request) {
 
 // === DELETE Experience ===
 export async function DELETE(req: Request) {
+  const supabase = createClient()
   const { id } = await req.json();
 
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });

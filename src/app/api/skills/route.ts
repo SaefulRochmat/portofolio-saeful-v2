@@ -1,9 +1,10 @@
 import {  NextResponse } from 'next/server';
-import { supabase } from '../../../lib/supabaseClient';
+import { createClient } from '@/utils/supabase/server';
 import type { Skill } from './typeSkill';
 
 // GET /api/skills
 export async function GET(): Promise<NextResponse> {
+    const supabase = createClient()
     const { data, error } = await supabase
         .from('skills')
         .select('*')
@@ -18,6 +19,7 @@ export async function GET(): Promise<NextResponse> {
 
 // POST /api/skills
 export async function POST(request: Request): Promise<NextResponse> {
+    const supabase = createClient()
     try {
         const body: Omit<Skill, 'id' | 'created_at'> = await request.json();
 
@@ -43,6 +45,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
 // PUT /api/skills
 export async function PUT(request: Request): Promise<NextResponse> {
+    const supabase = createClient()
     try {
         const body: Partial<Skill> = await request.json();
 
@@ -74,6 +77,7 @@ export async function PUT(request: Request): Promise<NextResponse> {
 
 // DELETE /api/skills
 export async function DELETE(request: Request): Promise<NextResponse> {
+    const supabase = createClient()
     try {
         const { id } = await request.json();
 

@@ -4,8 +4,8 @@ export interface Education {
   institution: string;
   degree: string;
   field_of_study: string;
-  start_date: string; // YYYY-MM-DD
-  end_date?: string; // Nullable, kalo masih kuliah bisa kosong
+  start_year: string; // YYYY-MM-DD
+  end_year?: string; // Nullable, kalo masih kuliah bisa kosong
   description?: string;
   created_at?: string;
 }

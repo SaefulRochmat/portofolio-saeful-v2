@@ -1,13 +1,16 @@
+//src/app/api/education/route.ts
+
 import { NextResponse } from 'next/server';
-import { supabase } from '../../../lib/supabaseClient';
+import { createClient } from '@/utils/supabase/server';
 import type { Education } from './typeEducation';
 
 // === GET All Education ===
 export async function GET() {
+  const supabase = createClient()
   const { data, error } = await supabase
     .from("education")
     .select("*")
-    .order("start_date", { ascending: false });
+    .order("start_year", { ascending: false });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 
@@ -16,23 +19,35 @@ export async function GET() {
 
 // === POST (Create Education Record) ===
 export async function POST(req: Request) {
+  const supabase = createClient()
   const body: Education = await req.json();
 
-  const { institution, degree, field_of_study, start_date, end_date, description } = body;
+  console.log("Received body:", body); // Tambahkan ini
+
+  const { institution, degree, field_of_study, start_year, end_year, description } = body;
 
   const { data, error } = await supabase
     .from("education")
-    .insert([{ institution, degree, field_of_study, start_date, end_date, description }])
+    .insert([{ 
+      institution, 
+      degree, 
+      field_of_study, 
+      start_year, 
+      end_year, 
+      description }])
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
-
+  if (error) {
+    console.error("Supabase error:", error); // Tambahkan ini
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
   return NextResponse.json(data, { status: 201 });
 }
 
 // === PUT (Update Education Record) ===
 export async function PUT(req: Request) {
+  const supabase = createClient()
   const body: Education = await req.json();
 
   if (!body.id)
@@ -44,8 +59,8 @@ export async function PUT(req: Request) {
       institution: body.institution,
       degree: body.degree,
       field_of_study: body.field_of_study,
-      start_date: body.start_date,
-      end_date: body.end_date,
+      start_year: body.start_year,
+      end_year: body.end_year,
       description: body.description,
     })
     .eq("id", body.id)
@@ -59,6 +74,7 @@ export async function PUT(req: Request) {
 
 // === DELETE Education Record ===
 export async function DELETE(req: Request) {
+  const supabase = createClient()
   const { id } = await req.json();
 
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
