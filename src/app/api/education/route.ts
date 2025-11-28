@@ -6,7 +6,7 @@ import type { Education } from './typeEducation';
 
 // === GET All Education ===
 export async function GET() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data, error } = await supabase
     .from("education")
     .select("*")
@@ -19,7 +19,7 @@ export async function GET() {
 
 // === POST (Create Education Record) ===
 export async function POST(req: Request) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const body: Education = await req.json();
 
   console.log("Received body:", body); // Tambahkan ini
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
 
 // === PUT (Update Education Record) ===
 export async function PUT(req: Request) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const body: Education = await req.json();
 
   if (!body.id)
@@ -74,7 +74,7 @@ export async function PUT(req: Request) {
 
 // === DELETE Education Record ===
 export async function DELETE(req: Request) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { id } = await req.json();
 
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });

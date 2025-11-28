@@ -1,3 +1,5 @@
+// src/app/api/projects/route.ts
+
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import type { Project } from './typeProject';
@@ -5,7 +7,7 @@ import type { Project } from './typeProject';
 // Handler for GET requests to /api/projects
 // Ambil semua project (bisa juga nanti difilter berdasarkan profile_id jika diperlukan)
 export async function GET(): Promise<NextResponse> {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { data, error } = await supabase
         .from('projects')
         .select('*')
@@ -21,7 +23,7 @@ export async function GET(): Promise<NextResponse> {
 // Handler for POST requests to /api/projects
 // Tambah project baru
 export async function POST(request: Request): Promise<NextResponse> {
-    const supabase = createClient()
+    const supabase = await createClient()
     try {
         const body: Omit<Project, 'id' | 'created_at'> = await request.json();
 
@@ -40,7 +42,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         }
 
         return NextResponse.json<Project>(data);
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: 'Invalid Request Body' }, { status: 400 });
     }
 }
@@ -48,7 +50,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 // Handler for PUT requests to /api/projects
 // Update project berdasarkan ID
 export async function PUT(request: Request): Promise<NextResponse> {
-    const supabase = createClient()
+    const supabase = await createClient()
     try {
         const body: Partial<Project> = await request.json();
         
@@ -77,7 +79,7 @@ export async function PUT(request: Request): Promise<NextResponse> {
         }
 
         return NextResponse.json<Project>(data);
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: 'Invalid Request Body' }, { status: 400 });
     }
 }
@@ -86,7 +88,7 @@ export async function PUT(request: Request): Promise<NextResponse> {
 // Handler for DELETE requests to /api/projects
 // Hapus project berdasarkan ID
 export async function DELETE(request: Request): Promise<NextResponse> {
-    const supabase = createClient()
+    const supabase = await createClient()
     try {
         const { id } = await request.json();
 
@@ -105,7 +107,7 @@ export async function DELETE(request: Request): Promise<NextResponse> {
 
         return NextResponse.json({ message: 'Project deleted successfully' });
 
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: 'Invalid Request Body' }, { status: 400 });
     }
 }
