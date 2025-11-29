@@ -29,13 +29,15 @@ const LoginButton = () => {
         size="sm"
         className="w-full transition duration-300 ease-in-out hover:bg-red-500 hover:text-white hover:-translate-y-[3px]"
       >
-        SignOut
+        LogOut
       </Button>
     );
   }
   return (
     <Button
-      variant="outline"
+      variant="link"
+        size="sm"
+        className="w-38 text-lg transition duration-300 ease-in-out hover:bg-green-500 hover:text-dark hover:-translate-y-[3px]"
       onClick={() => {
         router.push("/login");
       }}
