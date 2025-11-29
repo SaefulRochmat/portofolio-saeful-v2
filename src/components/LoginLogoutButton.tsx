@@ -25,8 +25,11 @@ const LoginButton = () => {
           signout();
           setUser(null);
         }}
+        variant="link"
+        size="sm"
+        className="w-full transition duration-300 ease-in-out hover:bg-red-500 hover:text-white hover:-translate-y-[3px]"
       >
-        Log out
+        SignOut
       </Button>
     );
   }
