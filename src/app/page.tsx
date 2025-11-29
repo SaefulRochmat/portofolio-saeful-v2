@@ -1,11 +1,17 @@
+
+import { EducationDisplay } from "@/components/HomePage/EducationComponents/EducationData";
+import ProfileDisplay from "@/components/HomePage/ProfileComponents/ProfileData";
 import LoginButton from "@/components/LoginLogoutButton";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-linear-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <LoginButton />
-        </div>
+    <main className="flex flex-col p-4 max-w-7xl mx-auto">
+      <div className="mb=4">
+        <ProfileDisplay/>
+      </div>
+      <div className="mb=4">
+        <EducationDisplay/>
+      </div>
     </main>
   );
 }
