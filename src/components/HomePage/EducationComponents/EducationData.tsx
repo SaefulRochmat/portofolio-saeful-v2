@@ -24,7 +24,7 @@ export function EducationDisplay({ profileId }: { profileId?: string }) {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-12">
+    <div className="max-w-4xl mx-auto px-12 mb-6">
         <h2 className="text-2xl font-bold mb-4 text-gray-800">Education</h2>
       {education.map((edu) => (
         <div key={edu.id} className="bg-white rounded-lg p-6 shadow-md border border-gray-100">

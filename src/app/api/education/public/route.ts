@@ -9,8 +9,6 @@ export async function GET(request: Request): Promise<NextResponse> {
   try {
     const supabase = await createClient();
 
-    console.log('🔍 Fetching all education records');
-
     // ✅ SIMPLE: Just return ALL education, no filter
     const { data, error } = await supabase
       .from("education")

@@ -1,6 +1,7 @@
 
 import { EducationDisplay } from "@/components/HomePage/EducationComponents/EducationData";
 import ProfileDisplay from "@/components/HomePage/ProfileComponents/ProfileData";
+import { ExperienceDisplay } from "@/components/HomePage/ExperienceComponents/ExperienceData";
 import LoginButton from "@/components/LoginLogoutButton";
 
 export default function Home() {
@@ -11,6 +12,9 @@ export default function Home() {
       </div>
       <div className="mb=4">
         <EducationDisplay/>
+      </div>
+      <div className="mb=4">
+        <ExperienceDisplay/>
       </div>
     </main>
   );
