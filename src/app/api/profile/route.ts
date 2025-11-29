@@ -1,18 +1,27 @@
 // src/app/api/profile/route.ts
+
 import { NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server"; // PENTING: Gunakan server client!
+import { createClient } from "@/utils/supabase/server";
 import type { Profile } from "./typeProfile";
 
-// Handler for GET requests to /api/profile
+// GET /api/profile - Get current user's profile
 export async function GET(): Promise<NextResponse> {
   try {
     const supabase = await createClient();
     
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Get profile by user ID
     const { data, error } = await supabase
       .from("profile")
       .select("*")
-      .limit(1)
-      .maybeSingle(); // Gunakan maybeSingle() untuk menghindari error jika tidak ada data
+      .eq('id', user.id)  // ✅ Filter by authenticated user ID
+      .maybeSingle();      // Use maybeSingle() instead of single()
 
     if (error) {
       console.error('❌ Error fetching profile:', error.message);
@@ -30,56 +39,51 @@ export async function GET(): Promise<NextResponse> {
   }
 }
 
-// Handler for PUT requests to /api/profile
+// PUT /api/profile - Update current user's profile
 export async function PUT(request: Request): Promise<NextResponse> {
   try {
+    const supabase = await createClient();
+    
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body: Partial<Profile> = await request.json();
 
-    if (!body.id) {
-      return NextResponse.json({ error: "Profile ID is required" }, { status: 400 });
-    }
+    console.log("🔄 Updating profile for user:", user.id);
 
-    console.log("🔄 Updating profile with ID:", body.id);
+    // Build update object - only include fields that are provided
+    const updateData: any = {
+      updated_at: new Date().toISOString()
+    };
 
-    const supabase = await createClient();
+    if (body.name !== undefined) updateData.name = body.name;
+    if (body.headline !== undefined) updateData.headline = body.headline;
+    if (body.bio !== undefined) updateData.bio = body.bio;
+    if (body.email !== undefined) updateData.email = body.email;
+    if (body.phone !== undefined) updateData.phone = body.phone;
+    if (body.location !== undefined) updateData.location = body.location;
+    if (body.profile_image !== undefined) updateData.profile_image = body.profile_image;
+    if (body.social_links !== undefined) updateData.social_links = body.social_links;
 
-    // Cek dulu apakah profile dengan id tersebut ada
-    const { data: existingProfile, error: checkError } = await supabase
-      .from("profile")
-      .select("id")
-      .eq("id", body.id)
-      .maybeSingle();
-
-    if (checkError) {
-      console.error('❌ Error checking profile:', checkError.message);
-      return NextResponse.json({ error: checkError.message }, { status: 400 });
-    }
-
-    if (!existingProfile) {
-      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
-    }
-
-    // Update profile
+    // Update profile using authenticated user ID (ignore body.id)
     const { data, error } = await supabase
       .from("profile")
-      .update({
-        name: body.name,
-        headline: body.headline,
-        bio: body.bio,
-        email: body.email,
-        phone: body.phone,
-        location: body.location,
-        profile_image: body.profile_image,
-        social_links: body.social_links,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", body.id)
+      .update(updateData)
+      .eq("id", user.id)  // ✅ Always use authenticated user ID
       .select()
-      .single();
+      .maybeSingle();     // ✅ Use maybeSingle() instead of single()
 
     if (error) {
       console.error('❌ Error updating profile:', error.message);
       return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    if (!data) {
+      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
 
     console.log('✅ Profile updated successfully:', data.id);
@@ -91,9 +95,18 @@ export async function PUT(request: Request): Promise<NextResponse> {
   }
 }
 
-// Handler for POST requests to /api/profile
+// POST /api/profile - Create new profile
 export async function POST(request: Request): Promise<NextResponse> {
   try {
+    const supabase = await createClient();
+    
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body: Partial<Profile> = await request.json();
 
     // Basic validation
@@ -101,19 +114,33 @@ export async function POST(request: Request): Promise<NextResponse> {
       return NextResponse.json({ error: 'Profile name is required' }, { status: 400 });
     }
 
-    const supabase = await createClient();
+    // Check if profile already exists
+    const { data: existingProfile } = await supabase
+      .from('profile')
+      .select('id')
+      .eq('id', user.id)
+      .maybeSingle();
 
+    if (existingProfile) {
+      return NextResponse.json(
+        { error: 'Profile already exists. Use PUT to update.' }, 
+        { status: 409 }
+      );
+    }
+
+    // Create profile with authenticated user ID
     const { data, error } = await supabase
       .from('profile')
       .insert([{
+        id: user.id,  // ✅ Use authenticated user ID
         name: body.name,
-        headline: body.headline,
-        bio: body.bio,
-        email: body.email,
-        phone: body.phone,
-        location: body.location,
-        profile_image: body.profile_image,
-        social_links: body.social_links,
+        headline: body.headline || null,
+        bio: body.bio || null,
+        email: body.email || user.email,  // Default to auth email
+        phone: body.phone || null,
+        location: body.location || null,
+        profile_image: body.profile_image || null,
+        social_links: body.social_links || null,
       }])
       .select()
       .single();
@@ -129,5 +156,34 @@ export async function POST(request: Request): Promise<NextResponse> {
   } catch (err) {
     console.error('❌ Server error:', err);
     return NextResponse.json({ error: 'Invalid Request Body' }, { status: 400 });
+  }
+}
+
+// DELETE /api/profile - Delete current user's profile
+export async function DELETE(): Promise<NextResponse> {
+  try {
+    const supabase = await createClient();
+    
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { error } = await supabase
+      .from('profile')
+      .delete()
+      .eq('id', user.id);
+
+    if (error) {
+      console.error('❌ Error deleting profile:', error.message);
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    return NextResponse.json({ message: 'Profile deleted successfully' });
+  } catch (err) {
+    console.error('❌ Server error:', err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
