@@ -1,4 +1,4 @@
-// src/hooks/usePublicExperience.ts
+// src/hooks/useExperience.ts
 
 import useSWR from 'swr';
 import type { Experience } from '@/app/api/experience/typeExperience';

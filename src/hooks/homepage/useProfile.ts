@@ -1,4 +1,4 @@
-// src/hooks/usePublicProfile.ts
+// src/hooks/useProfile.ts
 
 import useSWR from 'swr';
 import type { Profile } from '@/app/api/profile/typeProfile';

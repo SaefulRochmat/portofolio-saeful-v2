@@ -1,4 +1,4 @@
-// src/hooks/usePublicData.ts
+// src/hooks/useEducation.ts
 
 import useSWR from 'swr';
 import type { Education } from '@/app/api/education/typeEducation';
